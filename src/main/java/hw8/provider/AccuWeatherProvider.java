@@ -11,9 +11,9 @@ import okhttp3.Response;
 import hw8.ApplicationGlobalState;
 import hw8.dto.WeatherResponse;
 import hw8.enums.Periods;
-//import hw8.WeatherData;
-//import hw8.repository.DatabaseRepository;
-//import hw8.repository.DatabaseRepositorySQLiteImpl;
+import hw8.WeatherData;
+import hw8.repository.DatabaseRepository;
+import hw8.repository.DatabaseRepositorySQLiteImpl;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -33,7 +33,7 @@ public class AccuWeatherProvider implements WeatherProvider {
     private final OkHttpClient client = new OkHttpClient();
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-//    private DatabaseRepository repository = new DatabaseRepositorySQLiteImpl();
+    private DatabaseRepository repository = new DatabaseRepositorySQLiteImpl();
 
     @Override
     public void getWeather(Periods periods) throws IOException, SQLException {
@@ -99,18 +99,18 @@ public class AccuWeatherProvider implements WeatherProvider {
                         " ожидается такая погода: Минимальная температура "  + weather.getTemperature().getMinimum().getValue() + "°С. Максимальная температура " +
                         weather.getTemperature().getMaximum().getValue() + "°С. Днём - " + weather.getDay().getIconPhrase() + ". Ночью - " + weather.getNight().getIconPhrase() + ".");
 
-//                WeatherData weatherData = new WeatherData(ApplicationGlobalState.getInstance().getSelectedCity(),
-//                        weather.getDate().substring(0,10), weather.getDay().getIconPhrase(), weather.getNight().getIconPhrase(),
-//                        castFloatToDouble(weather.getTemperature().getMinimum().getValue()),  castFloatToDouble(weather.getTemperature().getMaximum().getValue())
-//                );
+                WeatherData weatherData = new WeatherData(ApplicationGlobalState.getInstance().getSelectedCity(),
+                        weather.getDate().substring(0,10), weather.getDay().getIconPhrase(), weather.getNight().getIconPhrase(),
+                        castFloatToDouble(weather.getTemperature().getMinimum().getValue()),  castFloatToDouble(weather.getTemperature().getMaximum().getValue())
+                );
 
-//                repository.saveWeatherData(weatherData);
+                repository.saveWeatherData(weatherData);
             }
         }
 
-//        if (periods.equals(Periods.BASE)) {
-//            getAllFromDb();
-//        }
+        if (periods.equals(Periods.BASE)) {
+            getAllFromDb();
+        }
 
         if (periods.equals(Periods.ZERO)) {
             exitApp();
@@ -119,7 +119,7 @@ public class AccuWeatherProvider implements WeatherProvider {
 
     private void exitApp() {
         System.out.println("Завершаю работу");
-//        repository.closeConnection();
+        repository.closeConnection();
         System.exit(0);
     }
 
@@ -129,14 +129,14 @@ public class AccuWeatherProvider implements WeatherProvider {
         return (double) value;
     }
 
-//    @Override
-//    public List<WeatherData> getAllFromDb() throws SQLException, IOException {
-////        List<WeatherData> weatherDataList = repository.getAllSavedData();
-//        for (WeatherData weatherData : weatherDataList) {
-//            System.out.println(weatherData);
-//        }
-//        return weatherDataList;
-//    }
+    @Override
+    public List<WeatherData> getAllFromDb() throws SQLException, IOException {
+        List<WeatherData> weatherDataList = repository.getAllSavedData();
+        for (WeatherData weatherData : weatherDataList) {
+            System.out.println(weatherData);
+        }
+        return weatherDataList;
+    }
 
     public String detectCityKey() throws IOException {
         String selectedCity = ApplicationGlobalState.getInstance().getSelectedCity();
